@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Setup Section -->
+        <div id="setup-container" class="welcome-container">
+            <h1>Welcome to the Inveringo</h1>
+            <p>Rearrange the numbers in the grid by dragging and dropping them!</p>
+            <div class="rearrange-container">
+                <div class="grid" id="setup-grid">
+                    <div class="cell" draggable="true">1</div>
+                    <div class="cell" draggable="true">2</div>
+                    <div class="cell" draggable="true">3</div>
+                    <div class="cell" draggable="true">4</div>
+                    <div class="cell" draggable="true">5</div>
+                    <div class="cell" draggable="true">6</div>
+                    <div class="cell" draggable="true">7</div>
+                    <div class="cell" draggable="true">8</div>
+                    <div class="cell" draggable="true">9</div>
+                </div>
+                <p>Click the button below to confirm your arrangement:</p>
+                <button id="confirm-button">Confirm</button>
+            </div>
+        </div>
+
+        <!-- Game Section (Hidden Initially) -->
+        <div id="game-container" class="hidden">
+            <div id="timer">15:00</div>
+            <div id="score-display">Score: 0 pts</div>
+
+            <!-- Questions Section -->
+            <div class="questions-section">
+                <h2>Question</h2>
+                <div id="question-box">
+                    <p id="current-question"></p>
+                </div>
+                <input type="text" id="answer-input" placeholder="Enter your answer" />
+                <div class="buttons">
+                    <button id="next-button">Next</button>
+                </div>
+                <button id="submit-button">Submit</button>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #555;">Note: Answers are case sensitive.</p>
+            </div>
+
+            <!-- Bingo Board Section -->
+            <div class="bingo-section">
+                <h2>Bingo Board</h2>
+                <div class="bingo-grid" id="bingo-grid">
+                    <div class="cell" id="cell-0"></div>
+                    <div class="cell" id="cell-1"></div>
+                    <div class="cell" id="cell-2"></div>
+                    <div class="cell" id="cell-3"></div>
+                    <div class="cell" id="cell-4"></div>
+                    <div class="cell" id="cell-5"></div>
+                    <div class="cell" id="cell-6"></div>
+                    <div class="cell" id="cell-7"></div>
+                    <div class="cell" id="cell-8"></div>
+                </div>
+
+                <!-- Words Display -->
+                <div class="words-display">
+                    <h3>Generated Letters</h3>
+                    <div id="generated-words">
+                        <p id="no-words">No Letter generated yet.</p>
+                    </div>
+                </div>
+
+                <!-- Notification Section -->
+                <div id="notification" class="hidden">
+                    <p>You have generated a new Letter!</p>
+                    <br />
+                    <p>Proceed to the next step?</p>
+                    <button id="proceed-button">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚡ Risk / Safe Modal -->
+    <div id="risk-modal" class="game-modal hidden">
+        <div class="modal-box">
+            <h2 class="modal-title">⚔️ Choose Your Mode</h2>
+            <p class="modal-subtitle">Declare <strong>before</strong> seeing the question!</p>
+            <div class="modal-options">
+                <button id="risk-safe-btn" class="modal-btn safe-btn">
+                    🛡️ SAFE
+                    <span>Correct → +10 pts<br>Wrong → 0 pts</span>
+                </button>
+                <button id="risk-risk-btn" class="modal-btn risk-btn">
+                    🎲 RISK
+                    <span>Correct → +25 pts<br>Wrong → −15 pts</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚡ Power Cell Reward Modal -->
+    <div id="power-modal" class="game-modal hidden">
+        <div class="modal-box power-modal-box">
+            <h2 class="modal-title">⚡ POWER CELL ACTIVATED!</h2>
+            <p class="modal-subtitle">Choose your reward:</p>
+            <div class="modal-options">
+                <button id="power-bonus-btn" class="modal-btn power-btn">
+                    💰 +20 Bonus
+                    <span>Instant score boost</span>
+                </button>
+                <button id="power-remove-btn" class="modal-btn power-btn">
+                    🗑️ Remove Penalty
+                    <span>Undo last −15</span>
+                </button>
+                <button id="power-freerisk-btn" class="modal-btn power-btn">
+                    🛡️ Free Risk Token
+                    <span>Next RISK has no penalty</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast"></div>
+
+    <script src="questions_round1.js"></script>
+    <script src="riddles.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 73) return false;
+            if (e.ctrlKey && e.keyCode == 85) return false;
+        };
+    </script>
+</body>
+
+</html>
