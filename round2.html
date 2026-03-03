@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Round 2 - Inveringo Challenge</title>
+    <style>
+        body {
+            background: #0b0f14;
+            color: #e6edf3;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 800px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #58a6ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 20px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input {
+            width: 60%;
+            padding: 15px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 6px;
+            font-size: 18px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #58a6ff;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #238636;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 16px;
+            height: 24px;
+        }
+
+        .error {
+            color: #ff7b72;
+        }
+
+        .success {
+            color: #3fb950;
+        }
+
+        .hidden {
+            display: none !important;
+            pointer-events: none !important;
+        }
+
+        /* Stage 2 Specifics */
+        #questionBox {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin-bottom: 20px;
+            text-align: left;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .code-label {
+            color: #8b949e;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .code-snippet {
+            background: #161b22;
+            color: #e6edf3;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #58a6ff;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            font-size: 18px;
+        }
+
+        .code-output {
+            background: #161b22;
+            color: #7ee787;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #238636;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            font-size: 18px;
+        }
+
+        #timerDisplay {
+            font-size: 18px;
+            color: #f2cc60;
+            font-family: monospace;
+            margin-bottom: 15px;
+        }
+
+        #statsDisplay {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .hint-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            background: #30363d;
+            border-color: #8b949e;
+        }
+
+        .hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hint-text {
+            margin-top: 10px;
+            padding: 10px;
+            background: #1f2428;
+            border-left: 3px solid #f2cc60;
+            color: #f2cc60;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .hint-modal {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            width: 400px;
+            text-align: center;
+            position: relative;
+            z-index: 10000;
+            /* Ensure modal content is explicitly above overlay */
+            pointer-events: auto !important;
+            /* Ensure clicks register on the modal */
+        }
+
+        .hint-option {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            pointer-events: auto;
+            /* Ensure clickable */
+            background: transparent;
+            width: 100%;
+            text-align: center;
+            display: block;
+        }
+
+        .hint-option:hover {
+            border-color: #58a6ff;
+            background: #1f2428;
+        }
+
+        .hint-option h3 {
+            margin: 0 0 5px 0;
+            color: #58a6ff;
+            font-size: 18px;
+        }
+
+        .hint-option p {
+            margin: 0;
+            font-size: 14px;
+            color: #8b949e;
+        }
+
+        .score-display {
+            font-size: 20px;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #58a6ff;
+            margin: 20px 0;
+        }
+
+        /* Failsafe to ensure clicks aren't intercepted by invisible containers */
+        #stage2 {
+            position: relative;
+            z-index: 10;
+        }
+
+        button {
+            position: relative;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">Inveringo Protocol v2.0</div>
+
+        <!-- Stage 1: Authentication -->
+        <div id="stage1">
+            <p style="color: #8b949e; margin-bottom: 20px;">SECURITY CLEARANCE REQUIRED</p>
+            <div class="input-group">
+                <input id="riddleInput" placeholder="ENTER ACCESS KEY" autocomplete="off"
+                    onkeydown="if(event.key==='Enter') checkRiddle()">
+            </div>
+            <button onclick="checkRiddle()">AUTHENTICATE</button>
+            <p id="riddleStatus" class="status"></p>
+        </div>
+
+        <!-- Stage 2: Quiz -->
+        <div id="stage2" class="hidden">
+            <div class="score-display">Score: <span id="scoreTracker">0</span> pts</div>
+
+            <div id="statsDisplay">
+                <span>Hints Left: <span id="hintsLeftDisplay" style="color:#f2cc60">2</span></span>
+                <span id="progressDisplay">Question 1/5</span>
+            </div>
+
+            <div id="timerDisplay">Time Left: 20:00</div>
+
+            <div id="questionBox">
+                <span class="code-label">INPUT CODE:</span>
+                <div id="codeSnippet" class="code-snippet">Loading...</div>
+
+                <span class="code-label">EXPECTED OUTPUT:</span>
+                <div id="expectedOutput" class="code-output">Loading...</div>
+            </div>
+
+            <div class="input-group" style="display: flex; gap: 10px; justify-content: center;">
+                <input id="inputA" placeholder="Input A" autocomplete="off" style="width: 45%;">
+                <input id="inputB" placeholder="Input B" autocomplete="off"
+                    onkeydown="if(event.key==='Enter') checkAnswer()" style="width: 45%;">
+            </div>
+
+            <button onclick="checkAnswer()">SUBMIT INPUTS</button>
+            <button id="showHintBtn" class="hint-btn" onclick="openHintModal()">USE HINT CARD</button>
+
+            <div id="activeHint" class="hint-text hidden"></div>
+            <p id="quizStatus" class="status"></p>
+        </div>
+
+        <!-- Hint Modal -->
+        <div id="hintModal" class="modal-overlay hidden">
+            <div class="hint-modal">
+                <h2 style="color: #f2cc60; margin-top: 0;">Use a Hint Card</h2>
+                <p>You have <strong id="modalHintsLeft">2</strong> Hint Cards remaining.</p>
+                <p style="font-size: 14px; color: #8b949e;">Max 1 hint per question.</p>
+
+                <button class="hint-option" onclick="buyHint('soft')">
+                    <h3>Soft Hint (-5 pts)</h3>
+                    <p>Guidance on logical direction.</p>
+                </button>
+
+                <button class="hint-option" style="border-color: #ff7b72" onclick="buyHint('strong')">
+                    <h3 style="color: #ff7b72">Strong Hint (-10 pts)</h3>
+                    <p>Direct pointer to edge cases / tricky lines.</p>
+                </button>
+
+                <button class="hint-btn" style="margin-top: 10px; width: 100%"
+                    onclick="closeHintModal()">CANCEL</button>
+            </div>
+        </div>
+
+        <!-- Final Result -->
+        <div id="stageFinal" class="hidden">
+            <h2>SESSION COMPLETE</h2>
+            <div id="finalScoreArea"></div>
+        </div>
+
+    </div>
+
+    <script src="questions_round2.js"></script>
+    <script>
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+
+        let attemptsUsedThisQuestion = 0;
+        let totalIncorrectAttempts = 0;
+        let totalHintsUsed = 0;
+        let hintCardsRemaining = 2; // Total for round
+        let hintUsedOnCurrent = false;
+
+        let timer;
+        let timeLeft = 1200; // 20 Minutes (1200 seconds)
+        let startTime;
+
+        const quizStatus = document.getElementById("quizStatus");
+        const inputA = document.getElementById("inputA");
+        const inputB = document.getElementById("inputB");
+        const activeHint = document.getElementById("activeHint");
+        const scoreTracker = document.getElementById("scoreTracker");
+
+        // Parse URL Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const topic = urlParams.get('topic');
+
+        window.onload = function () {
+            if (topic && round2Questions[topic]) {
+                startRound2(topic);
+            } else {
+                document.getElementById("stage1").style.display = 'block';
+                document.getElementById("stage2").classList.add("hidden");
+                document.getElementById("riddleInput").focus();
+            }
+        };
+
+        function checkRiddle() {
+            let val = document.getElementById("riddleInput").value.trim().toUpperCase();
+
+            if (typeof round2Questions === 'undefined') {
+                alert("Error: Question database not loaded. Please refresh the page.");
+                return;
+            }
+
+            if (round2Questions[val]) {
+                startRound2(val);
+            } else {
+                const status = document.getElementById("riddleStatus");
+                status.className = "status error";
+                status.innerText = "ACCESS DENIED: INVALID KEY";
+                const container = document.querySelector('.container');
+                container.style.transform = "translateX(10px)";
+                setTimeout(() => container.style.transform = "translateX(0)", 100);
+            }
+        }
+
+        function startRound2(topicKey) {
+            document.querySelector('.header').innerText = `ROUND 2: ${topicKey} PROTOCOL`;
+            document.getElementById("stage1").style.display = 'none';
+            document.getElementById("stage2").classList.remove("hidden");
+
+            const pool = round2Questions[topicKey];
+            questions = pool.sort(() => Math.random() - 0.5).slice(0, 5);
+
+            startTime = Date.now();
+            updateScore(0);
+            loadQuestion();
+        }
+
+        function updateScore(points) {
+            score += points;
+            scoreTracker.innerText = score;
+        }
+
+        let isTransitioning = false;
+
+        function loadQuestion() {
+            isTransitioning = false;
+            if (currentIndex >= questions.length) {
+                showFinal();
+                return;
+            }
+
+            let q = questions[currentIndex];
+            attemptsUsedThisQuestion = 0;
+            hintUsedOnCurrent = false;
+
+            // Reset UI
+            inputA.value = "";
+            inputB.value = "";
+            inputA.focus();
+            quizStatus.innerText = "";
+            quizStatus.className = "status";
+            activeHint.classList.add("hidden");
+            activeHint.innerText = "";
+
+            document.getElementById("showHintBtn").disabled = hintCardsRemaining <= 0;
+            document.getElementById("hintsLeftDisplay").innerText = hintCardsRemaining;
+
+            document.getElementById("codeSnippet").innerText = q.snippet;
+            document.getElementById("expectedOutput").innerText = q.output;
+            document.getElementById("progressDisplay").innerText = `Question ${currentIndex + 1}/${questions.length}`;
+
+            startTimer();
+        }
+
+        // Hint System Logistics
+        function openHintModal() {
+            console.log("Opening hint modal. Hints remaining:", hintCardsRemaining, "Used on current:", hintUsedOnCurrent);
+            if (hintCardsRemaining <= 0 || hintUsedOnCurrent) return;
+            document.getElementById("modalHintsLeft").innerText = hintCardsRemaining;
+            document.getElementById("hintModal").classList.remove("hidden");
+
+            // disable buttons if not enough score to cover penalty? Optional. We allow negative scores.
+        }
+
+        function closeHintModal() {
+            console.log("Closing hint modal");
+            document.getElementById("hintModal").classList.add("hidden");
+        }
+
+        function buyHint(type) {
+            console.log("Buying hint:", type);
+            if (hintCardsRemaining <= 0 || hintUsedOnCurrent) return;
+
+            let q = questions[currentIndex];
+            let penalty = (type === 'soft') ? -5 : -10;
+            let hintText = (type === 'soft') ? q.softHint : q.strongHint;
+
+            updateScore(penalty);
+            hintCardsRemaining--;
+            totalHintsUsed++;
+            hintUsedOnCurrent = true;
+
+            document.getElementById("hintsLeftDisplay").innerText = hintCardsRemaining;
+            document.getElementById("showHintBtn").disabled = true; // max 1 per question
+
+            activeHint.innerText = `💡 Hint (${type}): ${hintText}`;
+            activeHint.classList.remove("hidden");
+
+            closeHintModal();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            updateTimerDisplay();
+
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    quizStatus.className = "status error";
+                    quizStatus.innerText = "CRITICAL FAILURE: TIME EXPIRED";
+                    setTimeout(showFinal, 1500);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const text = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const display = document.getElementById("timerDisplay");
+            display.innerText = "Time Left: " + text;
+
+            if (timeLeft <= 120) {
+                display.style.color = "#ff7b72"; // Red warning last 2 mins
+            } else {
+                display.style.color = "#f2cc60";
+            }
+        }
+
+        function checkAnswer() {
+            if (isTransitioning) return;
+
+            let valA = inputA.value.trim();
+            let valB = inputB.value.trim();
+            let q = questions[currentIndex];
+
+            if (!valA || !valB) {
+                quizStatus.className = "status error";
+                quizStatus.innerText = "ERROR: TWO INPUTS REQUIRED";
+                return;
+            }
+
+            if (valA === valB) {
+                quizStatus.className = "status error";
+                quizStatus.innerText = "ERROR: INPUTS MUST BE DIFFERENT";
+                return;
+            }
+
+            // Dual Validation
+            // Question data should have `validAnswers` array.
+            // A correct submission is when BOTH valA and valB exist in the validAnswers array.
+            let isValidA = false;
+            let isValidB = false;
+
+            for (let ans of q.validAnswers) {
+                // String match validation
+                if (ans.toLowerCase() === valA.toLowerCase()) isValidA = true;
+                if (ans.toLowerCase() === valB.toLowerCase()) isValidB = true;
+            }
+
+            if (isValidA && isValidB) {
+                isTransitioning = true;
+                updateScore(50); // Correct dual-input reward
+                quizStatus.className = "status success";
+                quizStatus.innerText = "CORRECT";
+                setTimeout(nextQuestion, 1200);
+            } else {
+                attemptsUsedThisQuestion++;
+                totalIncorrectAttempts++;
+                updateScore(-10); // Penalty for wrong guess
+
+                quizStatus.className = "status error";
+                quizStatus.innerText = "❌ INCORRECT / INVALID COMBINATION (-10 pts)";
+
+                if (attemptsUsedThisQuestion >= 2) {
+                    isTransitioning = true;
+                    quizStatus.innerText = "❌ MAX ATTEMPTS REACHED. MOVING ON...";
+                    setTimeout(nextQuestion, 1500);
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function showFinal() {
+            document.getElementById("stage2").classList.add("hidden");
+            document.getElementById("stageFinal").classList.remove("hidden");
+
+            const totalSeconds = Math.round((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const timeText = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
+            document.getElementById("finalScoreArea").innerHTML = `
+            <div class="final-score">${score} pts</div>
+            <p style="font-size: 20px; color: ${score > 0 ? '#3fb950' : '#ff7b72'}">EVALUATION COMPLETE</p>
+            <div style="background: #0d1117; padding: 20px; border-radius: 8px; border: 1px solid #30363d; margin-top: 20px; text-align: left;">
+                <h3 style="color: #58a6ff; margin-top: 0">Tie-Breaker Metrics:</h3>
+                <p>⏱️ Total Time Taken: <strong>${timeText}</strong> <em>(Lower is better)</em></p>
+                <p>💡 Hint Cards Used: <strong>${totalHintsUsed} / 2</strong> <em>(Lower is better)</em></p>
+                <p>❌ Incorrect Attempts: <strong>${totalIncorrectAttempts}</strong> <em>(Lower is better)</em></p>
+            </div>
+        `;
+        }
+    </script>
+
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 73) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
+        };
+    </script>
+</body>
+
+</html>
